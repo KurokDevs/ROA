@@ -111,8 +111,6 @@ function Organizer({
   const settings = finance.settings!;
   const [incomeStr, setIncomeStr] = useState(existing ? centsToInput(existing.income) : '');
   const [accountId, setAccountId] = useState(existing?.accountId ?? settings.defaultAccountId);
-  const [grossStr, setGrossStr] = useState(existing?.grossIncome ? centsToInput(existing.grossIncome) : '');
-  const [withheldStr, setWithheldStr] = useState(existing?.withholdings ? centsToInput(existing.withholdings) : '');
   const [note, setNote] = useState(existing?.note ?? '');
   const [plan, setPlan] = useState<PlanResult | null>(null);
   const [lines, setLines] = useState<BudgetLine[]>(existing?.lines ?? []);
@@ -185,8 +183,6 @@ function Organizer({
         id: existing?.id,
         payDate,
         income,
-        grossIncome: settings.taxMode === 'w2' && grossStr ? toCents(grossStr) : null,
-        withholdings: settings.taxMode === 'w2' && withheldStr ? toCents(withheldStr) : null,
         lines,
         mode,
         deficit,
@@ -217,7 +213,7 @@ function Organizer({
             <div>
               <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{existing ? 'Editar el cobro de esta semana' : '¿Cuánto cobraste esta semana?'}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                {settings.taxMode === 'w2' ? 'Introduce tu salario neto (lo que llegó a tu cuenta).' : 'Introduce el total que recibiste. ROA calcula cuánto apartar para cada cosa.'}
+                Introduce el total que recibiste. ROA calcula cuánto apartar para cada cosa.
               </p>
             </div>
             <MoneyInput size="xl" value={incomeStr} onValueChange={setIncomeStr} placeholder="0" aria-label="Ingreso de la semana" autoFocus={!existing} />
@@ -246,16 +242,6 @@ function Organizer({
                   ))}
                 </NativeSelect>
               </Field>
-              {settings.taxMode === 'w2' && (
-                <>
-                  <Field label="Salario bruto (opcional)" htmlFor="gross">
-                    <MoneyInput id="gross" value={grossStr} onValueChange={setGrossStr} placeholder="0.00" />
-                  </Field>
-                  <Field label="Retenciones (opcional)" htmlFor="withheld">
-                    <MoneyInput id="withheld" value={withheldStr} onValueChange={setWithheldStr} placeholder="0.00" />
-                  </Field>
-                </>
-              )}
               <Field label="Nota (opcional)" htmlFor="note" className="sm:col-span-2">
                 <Input id="note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Ej.: semana con propinas altas" maxLength={120} />
               </Field>

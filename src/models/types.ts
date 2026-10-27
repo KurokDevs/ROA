@@ -5,12 +5,12 @@ import type { ISODate } from '@/lib/dates';
  * Niveles de prioridad del organizador semanal, en orden estricto.
  * Nunca se financia un nivel inferior mientras uno superior tenga déficit.
  */
-export type Tier = 'tax' | 'essential' | 'work' | 'debt' | 'living' | 'savings' | 'investment';
+export type Tier = 'essential' | 'work' | 'debt' | 'living' | 'savings' | 'investment';
 
-export const TIER_ORDER: Tier[] = ['tax', 'essential', 'work', 'debt', 'living', 'savings', 'investment'];
+export const TIER_ORDER: Tier[] = ['essential', 'work', 'debt', 'living', 'savings', 'investment'];
 
 /** Niveles que se consideran obligaciones (modo Supervivencia si no se cubren). */
-export const OBLIGATION_TIERS: Tier[] = ['tax', 'essential', 'work', 'debt', 'living'];
+export const OBLIGATION_TIERS: Tier[] = ['essential', 'work', 'debt', 'living'];
 
 /**
  * Cómo calcula el organizador la aportación de un sobre:
@@ -18,16 +18,15 @@ export const OBLIGATION_TIERS: Tier[] = ['tax', 'essential', 'work', 'debt', 'li
  *   entre los cobros restantes; sin fecha usa la reserva semanal con tope en el importe.
  * - topup: rellena hasta la cantidad semanal (gasolina, personal…).
  * - fixed: aporta la cantidad semanal hasta alcanzar el objetivo (si lo hay).
- * - tax: porcentaje del ingreso (solo contratista 1099).
  * - subscriptions: equivalente semanal de las suscripciones que siguen cobrando.
  * - debts: pagos pendientes de deudas y adelantos.
  * - investment: solo en modo Crecimiento.
  */
-export type FundingMethod = 'bill' | 'topup' | 'fixed' | 'tax' | 'subscriptions' | 'debts' | 'investment';
+export type FundingMethod = 'bill' | 'topup' | 'fixed' | 'subscriptions' | 'debts' | 'investment';
 
 export type BillFrequency = 'weekly' | 'monthly' | 'yearly';
 
-export type SystemEnvelope = 'tax' | 'subscriptions' | 'debts' | 'investment' | 'emergency' | 'vehicle_fund' | 'vehicle_maint';
+export type SystemEnvelope = 'subscriptions' | 'debts' | 'investment' | 'emergency' | 'vehicle_fund' | 'vehicle_maint';
 
 export interface Envelope {
   id: string;
@@ -107,7 +106,7 @@ export interface Transaction {
   description: string;
   debtId: string | null;
   budgetId: string | null;
-  /** Gasto profesional (para una posible declaración futura). */
+  /** Gasto del trabajo de delivery (se lista aparte en Trabajo y millas). */
   isBusiness: boolean;
   /** Pago de factura: avanza el vencimiento del sobre. */
   isBillPayment: boolean;
@@ -151,18 +150,12 @@ export interface BudgetLine {
   transferredAt: string | null;
 }
 
-export type TaxMode = '1099' | 'w2';
-
 export interface WeeklyBudget {
   id: string;
   /** Lunes de la semana (clave única: impide presupuestos duplicados). */
   weekKey: ISODate;
   payDate: ISODate;
   income: Cents;
-  grossIncome: Cents | null;
-  withholdings: Cents | null;
-  taxMode: TaxMode;
-  taxRate: string;
   mode: BudgetMode;
   lines: BudgetLine[];
   unassigned: Cents;
@@ -249,9 +242,6 @@ export interface Settings {
   currency: 'USD';
   /** 5 = viernes */
   paydayWeekday: number;
-  taxMode: TaxMode;
-  /** Tasa provisional de reserva fiscal, string decimal ("0.25"). */
-  taxRate: string;
   lowSeasonMin: Cents;
   lowSeasonMax: Cents;
   highSeasonMax: Cents;
@@ -269,7 +259,6 @@ export interface Settings {
 }
 
 export const TIER_LABELS: Record<Tier, string> = {
-  tax: 'Impuestos',
   essential: 'Esenciales',
   work: 'Trabajo y vehículo',
   debt: 'Pagos pendientes',
@@ -309,7 +298,6 @@ export const CATEGORIES = [
   'Salud',
   'Entretenimiento',
   'Suscripciones',
-  'Impuestos',
   'Trabajo delivery',
   'Comisiones',
   'Deudas',

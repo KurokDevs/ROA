@@ -236,7 +236,7 @@ export function TransactionDialog({ open, onOpenChange, initial, editing, title 
             <label className="flex items-center justify-between gap-3 rounded-xl bg-muted/60 p-3 text-sm">
               <span>
                 <span className="font-medium">Gasto profesional</span>
-                <span className="block text-xs text-muted-foreground">Se guarda aparte para una posible declaración futura. No calcula deducciones.</span>
+                <span className="block text-xs text-muted-foreground">Se guarda aparte en Trabajo y millas.</span>
               </span>
               <Switch checked={isBusiness} onCheckedChange={setIsBusiness} />
             </label>

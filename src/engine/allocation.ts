@@ -1,17 +1,17 @@
 import Decimal from 'decimal.js';
-import { applyRate, clampPositive, divideCentsUp, minCents, multiplyCents, sumCents, type Cents } from '@/lib/money';
+import { clampPositive, divideCentsUp, minCents, multiplyCents, sumCents, type Cents } from '@/lib/money';
 import { addDays, countWeekdaysBetween, diffDays, nextMonthlyOccurrence, type ISODate } from '@/lib/dates';
 import { formatMoney } from '@/lib/money';
-import type { BudgetLine, BudgetMode, Debt, Envelope, TaxMode, Tier } from '@/models/types';
+import type { BudgetLine, BudgetMode, Debt, Envelope, Tier } from '@/models/types';
 import { OBLIGATION_TIERS, TIER_ORDER } from '@/models/types';
 
 /**
  * ORGANIZADOR SEMANAL — cálculo 100 % determinista.
  *
  * Mismas entradas ⇒ mismo resultado. Orden estricto de prioridades:
- *   1. Reserva fiscal (1099)          4. Pagos pendientes / adelantos
- *   2. Obligaciones esenciales        5. Vida diaria (personal, pareja, suscripciones)
- *   3. Trabajo (gasolina, carro)      6. Ahorro / emergencias      7. Inversión
+ *   1. Obligaciones esenciales        4. Vida diaria (personal, pareja, suscripciones)
+ *   2. Trabajo (gasolina, carro)      5. Ahorro / emergencias
+ *   3. Pagos pendientes / adelantos   6. Inversión
  * Un nivel solo recibe dinero si todos los anteriores quedaron cubiertos;
  * así nunca se recomienda ahorrar o invertir dinero de una obligación prioritaria.
  */
@@ -30,8 +30,6 @@ export interface PlanInput {
   income: Cents;
   payDate: ISODate;
   paydayWeekday: number;
-  taxMode: TaxMode;
-  taxRate: string;
   envelopes: EnvelopeState[];
   debts: DebtState[];
   /** Gasto mensual de suscripciones que siguen cobrando (frecuencia confirmada). */
@@ -43,7 +41,6 @@ export interface PlanInput {
 export interface PlanResult {
   mode: BudgetMode;
   lines: BudgetLine[];
-  taxAmount: Cents;
   totalAllocated: Cents;
   unassigned: Cents;
   /** Lo que faltó para cubrir obligaciones (solo > 0 en Supervivencia). */
@@ -198,32 +195,17 @@ export function buildPlan(input: PlanInput): PlanResult {
   const active = input.envelopes.filter((s) => !s.envelope.archived);
   const bySystem = (sys: string) => active.find((s) => s.envelope.system === sys);
 
-  // 1. Reserva fiscal
-  let taxAmount = 0;
-  const taxEnv = bySystem('tax');
-  if (input.taxMode === '1099' && taxEnv) {
-    const taxNeed = applyRate(income, input.taxRate);
-    taxAmount = minCents(taxNeed, remaining);
-    remaining -= taxAmount;
-    const n: Need = { key: taxEnv.envelope.id, envelope: taxEnv.envelope, debtId: null, label: taxEnv.envelope.name, tier: 'tax', need: taxNeed, dueDate: null, reason: '' };
-    lines.push(line(n, taxAmount, `Estimación provisional del ${new Decimal(input.taxRate).times(100).toString()} % (contratista 1099)`));
-    steps.push(`Reserva fiscal provisional: ${formatMoney(taxAmount)}`);
-  } else if (input.taxMode === 'w2') {
-    steps.push('Empleado W-2: los impuestos ya se retienen en nómina');
-  }
-
-  // 2–5. Obligaciones por nivel
+  // 1–4. Obligaciones por nivel
   const needs: Need[] = [];
   for (const s of active) {
-    if (!OBLIGATION_TIERS.includes(s.envelope.tier) || s.envelope.method === 'tax' || s.envelope.method === 'debts') continue;
+    if (!OBLIGATION_TIERS.includes(s.envelope.tier) || s.envelope.method === 'debts') continue;
     const n = envelopeNeed(s, input);
     if (n) needs.push(n);
   }
   needs.push(...debtNeeds(input, bySystem('debts')));
 
-  let obligationsNeed = taxAmount;
+  let obligationsNeed = 0;
   for (const tier of OBLIGATION_TIERS) {
-    if (tier === 'tax') continue;
     const tierNeeds = needs.filter((n) => n.tier === tier).sort(sortNeeds);
     for (const n of tierNeeds) {
       obligationsNeed += n.need;
@@ -233,8 +215,6 @@ export function buildPlan(input: PlanInput): PlanResult {
       if (amount < n.need) shortfalls.push({ key: n.key, label: n.label, missing: n.need - amount });
     }
   }
-  const taxShort = taxEnv && input.taxMode === '1099' ? applyRate(income, input.taxRate) - taxAmount : 0;
-  if (taxShort > 0 && taxEnv) shortfalls.unshift({ key: taxEnv.envelope.id, label: taxEnv.envelope.name, missing: taxShort });
 
   const deficit = sumCents(shortfalls.map((s) => s.missing));
   let mode: BudgetMode;
@@ -245,7 +225,7 @@ export function buildPlan(input: PlanInput): PlanResult {
     warnings.push('Modo Supervivencia: no se aparta nada para ahorro ni inversión hasta cubrir obligaciones.');
   } else {
     steps.push('Obligaciones cubiertas');
-    // 6. Ahorro base
+    // 5. Ahorro base
     const savings = active.filter((s) => s.envelope.tier === 'savings').sort((a, b) => a.envelope.priority - b.envelope.priority);
     const savingsAlloc = new Map<string, Cents>();
     for (const s of savings) {
@@ -294,7 +274,7 @@ export function buildPlan(input: PlanInput): PlanResult {
       lines.push(line({ key: s.envelope.id, envelope: s.envelope, debtId: null, label: s.envelope.name, tier: 'savings', need: n?.need ?? 0, dueDate: null, reason }, amount));
     }
 
-    // 7. Inversión — solo con obligaciones y reservas mínimas cubiertas.
+    // 6. Inversión — solo con obligaciones y reservas mínimas cubiertas.
     if (mode === 'growth' && investEnv) {
       const amount = multiplyCents(remaining, input.surplusToInvestRate);
       remaining -= amount;
@@ -316,7 +296,6 @@ export function buildPlan(input: PlanInput): PlanResult {
   return {
     mode,
     lines: ordered,
-    taxAmount,
     totalAllocated,
     unassigned: income - totalAllocated,
     deficit,

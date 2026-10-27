@@ -25,7 +25,6 @@ export default {
         popover: { DEFAULT: 'hsl(var(--popover))', foreground: 'hsl(var(--popover-foreground))' },
         card: { DEFAULT: 'hsl(var(--card))', foreground: 'hsl(var(--card-foreground))' },
         tier: {
-          tax: 'hsl(var(--tier-tax))',
           essential: 'hsl(var(--tier-essential))',
           work: 'hsl(var(--tier-work))',
           debt: 'hsl(var(--tier-debt))',

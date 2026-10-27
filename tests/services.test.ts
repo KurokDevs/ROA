@@ -35,9 +35,8 @@ describe('flujo cobro → distribución → confirmación → almacenamiento', (
     expect(txs).toHaveLength(1);
     expect(txs[0].type).toBe('income');
     const bal = await balances();
-    expect(bal.get('env_tax')).toBe(20000);
     expect(bal.get('env_rent')).toBe(10000);
-    expect(bal.get('env_emergency')).toBe(9300);
+    expect(bal.get('env_emergency')).toBe(19300);
   });
 
   it('impide duplicar el presupuesto de la misma semana', async () => {
@@ -76,7 +75,8 @@ describe('flujo cobro → distribución → confirmación → almacenamiento', (
     const incomes = (await db.transactions.toArray()).filter((t) => t.type === 'income');
     expect(incomes).toHaveLength(2);
     expect(flowTotals(incomes).income).toBe(170000);
-    expect((await balances()).get('env_tax')).toBe(27500 + 15000);
+    expect((await balances()).get('env_rent')).toBe(20000);
+    expect(await db.entries.where('budgetId').equals(b.id).count()).toBeGreaterThan(0);
   });
 
   it('semanas que cruzan de año: claves distintas y sin falsos duplicados', async () => {
@@ -99,10 +99,10 @@ describe('flujo cobro → distribución → confirmación → almacenamiento', (
   it('distingue plan de transferencia realmente ejecutada', async () => {
     const b = await confirmWeek(80000, '2026-11-06');
     expect(b.lines.every((l) => !l.transferred)).toBe(true);
-    await setLineTransferred(db, b.id, 'env_tax', true);
+    await setLineTransferred(db, b.id, 'env_rent', true);
     const after = await db.budgets.get(b.id);
-    expect(after?.lines.find((l) => l.key === 'env_tax')?.transferred).toBe(true);
-    expect(after?.lines.find((l) => l.key === 'env_rent')?.transferred).toBe(false);
+    expect(after?.lines.find((l) => l.key === 'env_rent')?.transferred).toBe(true);
+    expect(after?.lines.find((l) => l.key === 'env_phone')?.transferred).toBe(false);
   });
 });
 
@@ -196,7 +196,7 @@ describe('patrimonio sin doble conteo', () => {
     const envelopeTotal = [...bal.values()].reduce((s, v) => s + v, 0);
     const nw = netWorth({ accounts: await db.accounts.toArray(), txs, debts: [], holdings: [], trades: [], envelopeTotal });
     expect(nw.netWorth).toBe(80000);
-    expect(nw.reservedInEnvelopes).toBe(80000 - 5299);
+    expect(nw.reservedInEnvelopes).toBe(80000 - 15299);
     const goal = (await db.goals.get('goal_nw5'))!;
     expect(goalCurrent(goal, bal, nw.netWorth)).toBe(80000);
   });

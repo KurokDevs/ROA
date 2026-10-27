@@ -52,6 +52,29 @@ export class RoaDB extends Dexie {
       holdings: 'id',
       trades: 'id, holdingId, date'
     });
+    // v2: se elimina la reserva de impuestos. El dinero que estaba en el sobre
+    // de impuestos vuelve a quedar como saldo disponible.
+    this.version(2)
+      .stores({})
+      .upgrade(async (tx) => {
+        await tx.table('entries').where('envelopeId').equals('env_tax').delete();
+        await tx.table('envelopes').delete('env_tax');
+        await tx.table('transactions').where('envelopeId').equals('env_tax').modify({ envelopeId: null });
+        await tx.table('budgets').toCollection().modify((b: Record<string, unknown>) => {
+          const lines = (b.lines as { envelopeId: string; amount: number }[]).filter((l) => l.envelopeId !== 'env_tax');
+          const allocated = lines.reduce((sum, l) => sum + l.amount, 0);
+          b.lines = lines;
+          b.unassigned = (b.income as number) - allocated;
+          delete b.taxMode;
+          delete b.taxRate;
+          delete b.grossIncome;
+          delete b.withholdings;
+        });
+        await tx.table('settings').toCollection().modify((st: Record<string, unknown>) => {
+          delete st.taxMode;
+          delete st.taxRate;
+        });
+      });
   }
 }
 

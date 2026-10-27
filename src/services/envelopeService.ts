@@ -89,7 +89,7 @@ export async function saveEnvelope(db: RoaDB, envelope: Envelope, today: ISODate
 export async function archiveEnvelope(db: RoaDB, id: string, archived = true): Promise<void> {
   const env = await db.envelopes.get(id);
   if (!env) return;
-  if (env.system && archived && ['tax', 'debts', 'investment', 'subscriptions'].includes(env.system)) {
+  if (env.system && archived && ['debts', 'investment', 'subscriptions'].includes(env.system)) {
     throw new AppError('Este sobre es parte del sistema y no se puede archivar.');
   }
   await db.envelopes.update(id, { archived });

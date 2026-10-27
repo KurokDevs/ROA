@@ -11,7 +11,7 @@ import { SettingsPage } from '@/pages/SettingsPage';
 import { EnvelopesPage } from '@/pages/EnvelopesPage';
 import { SubscriptionsPage } from '@/pages/SubscriptionsPage';
 import { DebtsPage } from '@/pages/DebtsPage';
-import { TaxesPage } from '@/pages/TaxesPage';
+import { WorkPage } from '@/pages/WorkPage';
 import { InvestmentsPage } from '@/pages/InvestmentsPage';
 import { LogoMark } from '@/components/layout/Logo';
 
@@ -61,7 +61,7 @@ export function App() {
           <Route path="sobres" element={<EnvelopesPage />} />
           <Route path="suscripciones" element={<SubscriptionsPage />} />
           <Route path="deudas" element={<DebtsPage />} />
-          <Route path="impuestos" element={<TaxesPage />} />
+          <Route path="trabajo" element={<WorkPage />} />
           <Route path="inversiones" element={<InvestmentsPage />} />
           <Route
             path="estadisticas"

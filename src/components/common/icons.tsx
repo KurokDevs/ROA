@@ -72,7 +72,6 @@ export const ENVELOPE_ICONS: Record<string, LucideIcon> = {
 };
 
 export const TIER_COLOR: Record<Tier | 'free', string> = {
-  tax: 'hsl(var(--tier-tax))',
   essential: 'hsl(var(--tier-essential))',
   work: 'hsl(var(--tier-work))',
   debt: 'hsl(var(--tier-debt))',

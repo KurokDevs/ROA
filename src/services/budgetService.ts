@@ -29,8 +29,6 @@ export async function loadPlanInput(db: RoaDB, income: Cents, payDate: ISODate, 
     income,
     payDate,
     paydayWeekday: settings.paydayWeekday,
-    taxMode: settings.taxMode,
-    taxRate: settings.taxRate,
     envelopes: envelopes.map((envelope) => ({ envelope, balance: balances.get(envelope.id) ?? 0 })),
     debts: debts.map((debt) => ({ debt, balance: debtBalance(debt, txs) })),
     subscriptionsMonthly: summarizeSubscriptions(subs).monthlyCharging,
@@ -48,8 +46,6 @@ export interface ConfirmBudgetParams {
   id?: string;
   payDate: ISODate;
   income: Cents;
-  grossIncome?: Cents | null;
-  withholdings?: Cents | null;
   lines: BudgetLine[];
   mode: BudgetMode;
   deficit: Cents;
@@ -136,10 +132,6 @@ export async function confirmBudget(db: RoaDB, params: ConfirmBudgetParams): Pro
       weekKey,
       payDate: params.payDate,
       income: params.income,
-      grossIncome: params.grossIncome ?? null,
-      withholdings: params.withholdings ?? null,
-      taxMode: settings.taxMode,
-      taxRate: settings.taxRate,
       mode: params.mode,
       lines,
       unassigned: summary.unassigned,

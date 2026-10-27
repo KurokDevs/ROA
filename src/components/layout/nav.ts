@@ -1,4 +1,4 @@
-import { ArrowLeftRight, ChartColumn, CalendarDays, House, Landmark, Layers, Repeat, Settings, Target, TrendingUp, HandCoins, type LucideIcon } from 'lucide-react';
+import { ArrowLeftRight, ChartColumn, CalendarDays, House, Layers, Repeat, Settings, Target, TrendingUp, HandCoins, Route, type LucideIcon } from 'lucide-react';
 
 export interface NavItem {
   to: string;
@@ -16,7 +16,7 @@ export const NAV_ITEMS: NavItem[] = [
   { to: '/sobres', label: 'Sobres', icon: Layers },
   { to: '/suscripciones', label: 'Suscripciones', icon: Repeat },
   { to: '/deudas', label: 'Deudas y adelantos', icon: HandCoins },
-  { to: '/impuestos', label: 'Impuestos y millas', icon: Landmark },
+  { to: '/trabajo', label: 'Trabajo y millas', icon: Route },
   { to: '/inversiones', label: 'Inversiones', icon: TrendingUp },
   { to: '/estadisticas', label: 'Estadísticas', icon: ChartColumn },
   { to: '/ajustes', label: 'Ajustes', icon: Settings, primary: true }

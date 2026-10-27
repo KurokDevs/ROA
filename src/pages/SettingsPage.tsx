@@ -155,7 +155,6 @@ export function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Ingresos y organizador</CardTitle>
-          <CardDescription>Los impuestos (1099/W-2 y %) se configuran en Impuestos y millas.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-3 sm:grid-cols-2">
           <Field label="Día de cobro" htmlFor="st-payday">

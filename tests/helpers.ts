@@ -20,8 +20,6 @@ export function planInput(
     balances?: Record<string, Cents>;
     envelopes?: Envelope[];
     debts?: { debt: Debt; balance: Cents }[];
-    taxMode?: '1099' | 'w2';
-    taxRate?: string;
     subscriptionsMonthly?: Cents;
   } = {}
 ): PlanInput {
@@ -31,8 +29,6 @@ export function planInput(
     income,
     payDate: opts.payDate ?? '2026-11-06',
     paydayWeekday: s.paydayWeekday,
-    taxMode: opts.taxMode ?? s.taxMode,
-    taxRate: opts.taxRate ?? s.taxRate,
     envelopes: envelopes.map((envelope) => ({ envelope, balance: opts.balances?.[envelope.id] ?? 0 })),
     debts: opts.debts ?? [],
     subscriptionsMonthly: opts.subscriptionsMonthly ?? SEED_SUBS_MONTHLY,

@@ -1,6 +1,6 @@
 # ROA Finance
 
-Aplicación web progresiva (PWA) de finanzas personales para ingresos semanales variables (trabajo de delivery). Cada viernes respondes una pregunta: **¿cuánto cobraste esta semana?** y ROA calcula de forma determinista cuánto apartar para impuestos, facturas, gasolina, gastos personales, deudas, emergencias e inversiones.
+Aplicación web progresiva (PWA) de finanzas personales para ingresos semanales variables (trabajo de delivery). Cada viernes respondes una pregunta: **¿cuánto cobraste esta semana?** y ROA calcula de forma determinista cuánto apartar para facturas, gasolina, gastos personales, deudas, emergencias e inversiones.
 
 - 100 % local: los datos se guardan en **IndexedDB** del dispositivo (nunca en `localStorage`).
 - Funciona **sin conexión** una vez cargada e **instalable en iPhone** desde Safari.
@@ -85,19 +85,18 @@ El resultado queda en la carpeta `dist/`.
 
 Cálculo determinista y comprobable (`src/engine/allocation.ts`), sin IA ni aleatoriedad. Orden estricto de prioridades; un nivel solo recibe dinero si todos los anteriores quedaron cubiertos:
 
-1. **Impuestos** — reserva provisional configurable (25 % por defecto, contratista 1099). En W-2 no se aparta nada (ya hay retención).
-2. **Esenciales** — alquiler, teléfono, seguro, electricidad…
-3. **Trabajo y vehículo** — gasolina y mantenimiento del carro.
-4. **Pagos pendientes** — deudas y adelantos (pago semanal pactado o el saldo completo si vence esa semana).
-5. **Vida diaria** — personal, pareja, suscripciones que siguen cobrando.
-6. **Ahorro** — fondo de emergencia, fondo del carro, objetivos.
-7. **Inversión** — solo en modo Crecimiento.
+1. **Esenciales** — alquiler, teléfono, seguro, electricidad…
+2. **Trabajo y vehículo** — gasolina y mantenimiento del carro.
+3. **Pagos pendientes** — deudas y adelantos (pago semanal pactado o el saldo completo si vence esa semana).
+4. **Vida diaria** — personal, pareja, suscripciones que siguen cobrando.
+5. **Ahorro** — fondo de emergencia, fondo del carro, objetivos.
+6. **Inversión** — solo en modo Crecimiento.
 
 **Modos automáticos**
 
 | Modo | Condición | Qué hace |
 |---|---|---|
-| Supervivencia | El ingreso no cubre las obligaciones (1–5) | Protege lo esencial en orden y muestra el déficit. Nada a ahorro ni inversión. |
+| Supervivencia | El ingreso no cubre las obligaciones (1–4) | Protege lo esencial en orden y muestra el déficit. Nada a ahorro ni inversión. |
 | Estabilidad | Obligaciones cubiertas, reservas mínimas incompletas | Aportaciones de ahorro + 50 % del excedente para reforzar reservas (configurable). |
 | Crecimiento | Obligaciones y reservas mínimas cubiertas (fondo de emergencia ≥ $500) | 50 % del excedente se propone para inversión (configurable). |
 
@@ -108,7 +107,7 @@ Cálculo determinista y comprobable (`src/engine/allocation.ts`), sin IA ni alea
 - **Presupuesto semanal (gasolina, personal, pareja):** rellena hasta la cantidad semanal teniendo en cuenta lo que sobró.
 - **Ahorro:** aportación semanal hasta alcanzar el objetivo.
 
-Ejemplos con la configuración inicial: $500 → Supervivencia (déficit de $59.01); $600 → Estabilidad; $800 → Estabilidad con $52.99 libres; $1,100 → Estabilidad, y Crecimiento cuando el fondo de emergencia supera $500.
+Ejemplos con la configuración inicial: $400 → Supervivencia (déficit de $34.01); $500 → Estabilidad con $2.99 libres; $800 → Estabilidad con $152.99 libres; $1,100 → Estabilidad, y Crecimiento (≈ $303 para invertir) cuando el fondo de emergencia supera $500.
 
 Antes de confirmar puedes **editar cualquier importe**. Al confirmar se guarda de forma atómica (ingreso + reservas en sobres + presupuesto) con una **clave única por semana**, así un doble toque o un segundo intento nunca duplican. Después, en «Transferencias en tu banco», marcas qué reservas moviste realmente: el plan y la transferencia ejecutada son cosas distintas.
 
@@ -137,7 +136,7 @@ Metas iniciales: Fondo inmediato $500 · Reserva de emergencia $2,000 · Fondo d
 - Todos los importes se guardan como **centavos enteros** y los porcentajes, divisiones y conversiones se calculan con **decimal.js** (sin errores de coma flotante).
 - **Patrimonio = efectivo en cuentas + valor de inversiones − deudas.** Los sobres son una subdivisión del efectivo y no se suman de nuevo.
 - Las **transferencias internas**, aportaciones, adelantos y pagos de capital de deudas no cuentan como ingreso ni gasto.
-- Los **impuestos** son una estimación provisional; ROA no calcula deducciones. Millas y gastos profesionales se registran aparte para una posible declaración.
+- **Trabajo y millas:** las millas recorridas y los gastos del trabajo se registran aparte.
 - **Inversiones:** seguimiento manual, sin operaciones reales ni promesas de rendimiento. Las simulaciones se marcan como hipotéticas.
 
 ## Estructura del proyecto
@@ -155,7 +154,7 @@ src/
   hooks/        useFinance (lectura reactiva), useTheme
   components/   ui/ (shadcn), common/, forms/, layout/
   pages/        Inicio, Mi Semana, Movimientos, Metas, Ajustes, Sobres,
-                Suscripciones, Deudas, Impuestos, Inversiones, Estadísticas
+                Suscripciones, Deudas, Trabajo y millas, Inversiones, Estadísticas
 tests/          Vitest (motor + servicios con IndexedDB simulada)
 ```
 
@@ -165,6 +164,6 @@ La UI nunca habla con la base de datos directamente para escribir: usa `src/serv
 
 ## Pruebas
 
-`npm test` ejecuta 66 pruebas: semanas de $500/$600/$800/$1,100, déficit, facturas mensuales y meses de cinco viernes, pagos anticipados, adelantos y devoluciones, transferencias internas, impuestos configurables (1099, W-2, 0 %, 15 %), cancelación de suscripciones, semanas que cruzan meses y años, edición de registros históricos, prevención de duplicados (incluido el doble toque), copias de seguridad y CSV.
+`npm test` ejecuta 65 pruebas: semanas de $400/$500/$600/$800/$1,100, déficit, facturas mensuales y meses de cinco viernes, pagos anticipados, adelantos y devoluciones, transferencias internas, cancelación de suscripciones, migración de datos, semanas que cruzan meses y años, edición de registros históricos, prevención de duplicados (incluido el doble toque), copias de seguridad y CSV.
 
 Iconos: `node scripts/generate-icons.mjs` regenera los PNG desde `public/favicon.svg` (requiere Playwright).

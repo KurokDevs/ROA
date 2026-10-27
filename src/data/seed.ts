@@ -9,8 +9,6 @@ export function defaultSettings(createdAt: string): Settings {
     id: 'main',
     currency: 'USD',
     paydayWeekday: 5,
-    taxMode: '1099',
-    taxRate: '0.25',
     lowSeasonMin: 50000,
     lowSeasonMax: 60000,
     highSeasonMax: 110000,
@@ -55,7 +53,6 @@ function env(seed: EnvSeed, createdAt: string): Envelope {
 
 export function defaultEnvelopes(createdAt: string): Envelope[] {
   const list: EnvSeed[] = [
-    { id: 'env_tax', name: 'Impuestos', icon: 'landmark', tier: 'tax', method: 'tax', system: 'tax', priority: 0 },
     { id: 'env_rent', name: 'Alquiler', icon: 'home', tier: 'essential', method: 'bill', billAmount: 40000, weeklyAmount: 10000, priority: 1 },
     { id: 'env_phone', name: 'Teléfono', icon: 'smartphone', tier: 'essential', method: 'bill', billAmount: 12000, weeklyAmount: 3000, priority: 2 },
     { id: 'env_insurance', name: 'Seguro del carro', icon: 'shield-check', tier: 'essential', method: 'bill', billAmount: 12000, weeklyAmount: 3000, isVehicle: true, priority: 3 },

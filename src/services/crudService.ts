@@ -9,10 +9,6 @@ import { AppError } from './errors';
 const now = () => new Date().toISOString();
 
 export async function updateSettings(db: RoaDB, patch: Partial<Settings>): Promise<void> {
-  if (patch.taxRate !== undefined) {
-    const r = new Decimal(patch.taxRate || 0);
-    if (r.isNeg() || r.gt(0.6)) throw new AppError('La reserva fiscal debe estar entre 0 % y 60 %.');
-  }
   for (const k of ['surplusToSavingsRate', 'surplusToInvestRate'] as const) {
     if (patch[k] !== undefined) {
       const r = new Decimal(patch[k] || 0);

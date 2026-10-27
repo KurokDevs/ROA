@@ -170,8 +170,7 @@ function guessCategory(env: Envelope): string {
     env_car_fund: 'Reparación vehículo',
     env_personal: 'Comida',
     env_couple: 'Pareja',
-    env_subs: 'Suscripciones',
-    env_tax: 'Impuestos'
+    env_subs: 'Suscripciones'
   };
   return map[env.id] ?? (env.isVehicle ? 'Mantenimiento vehículo' : env.tier === 'essential' ? 'Servicios' : 'Otros');
 }
@@ -211,7 +210,6 @@ function EnvelopeCard({ env, f, onClick }: { env: Envelope; f: FinanceData; onCl
               {env.method === 'bill' && (due ? `Vence ${formatDateShort(due)}` : 'Sin fecha de vencimiento')}
               {env.method === 'topup' && `Semanal ${formatMoney(env.weeklyAmount)}`}
               {env.method === 'fixed' && (env.targetAmount > 0 ? `Objetivo ${formatMoney(env.targetAmount, { compact: true })}` : `Aporte ${formatMoney(env.weeklyAmount)}`)}
-              {env.method === 'tax' && `Reserva ${Number(f.settings?.taxRate ?? 0) * 100}% (estimación)`}
               {env.method === 'debts' && 'Pagos de deudas y adelantos'}
               {env.method === 'subscriptions' && 'Suscripciones activas'}
               {env.method === 'investment' && 'Solo en modo Crecimiento'}
@@ -314,7 +312,7 @@ function EnvelopeDetail({ env, f, onEdit, onMove, onSpend }: { env: Envelope; f:
         <Button size="sm" variant="secondary" onClick={onEdit}>
           <Pencil /> Editar
         </Button>
-        {!['tax', 'debts', 'investment', 'subscriptions'].includes(env.system ?? '') && (
+        {!['debts', 'investment', 'subscriptions'].includes(env.system ?? '') && (
           <Button size="sm" variant="ghost" onClick={archive}>
             <Archive /> {env.archived ? 'Restaurar' : 'Archivar'}
           </Button>
@@ -364,7 +362,7 @@ function EnvelopeFormDialog({ open, env, isNew, onOpenChange }: { open: boolean;
   }, [open, env]);
   if (!draft) return null;
   const set = <K extends keyof Envelope>(k: K, v: Envelope[K]) => setDraft((d) => (d ? { ...d, [k]: v } : d));
-  const isSystemMethod = ['tax', 'debts', 'subscriptions', 'investment'].includes(draft.method);
+  const isSystemMethod = ['debts', 'subscriptions', 'investment'].includes(draft.method);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();

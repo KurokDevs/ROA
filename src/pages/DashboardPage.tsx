@@ -9,11 +9,11 @@ import {
   CalendarDays,
   ChartColumn,
   HandCoins,
-  Landmark,
   Layers,
   PiggyBank,
   Receipt,
   Repeat,
+  Route,
   ShieldCheck,
   Sparkles,
   TrendingUp,
@@ -48,19 +48,15 @@ export function DashboardPage() {
     // Periodo de cobro: del último día de cobro a los 6 días siguientes (p. ej. viernes → jueves).
     const payday = lastPayday(f.today, settings?.paydayWeekday ?? 5);
     const thisWeek = weekStart(payday);
-    const prevWeek = addDays(thisWeek, -7);
     const inPeriod = (start: string) => f.transactions.filter((t) => t.date >= start && t.date <= addDays(start, 6));
     const flowsNow = flowTotals(inPeriod(payday));
     const flowsPrev = flowTotals(inPeriod(addDays(payday, -7)));
     const hasPrev = f.transactions.some((t) => t.date < payday);
     const budget = f.budgets.find((b) => b.weekKey === thisWeek);
-    const prevBudget = f.budgets.find((b) => b.weekKey === prevWeek);
     const lastBudget = budget ?? [...f.budgets].sort((a, b) => b.weekKey.localeCompare(a.weekKey))[0];
     const summary = lastBudget ? summarizeLines(lastBudget.income, lastBudget.lines) : null;
     const spendTiers = ['essential', 'work', 'living', 'debt'] as const;
     const budgeted = budget ? sumCents(budget.lines.filter((l) => (spendTiers as readonly string[]).includes(l.tier)).map((l) => l.amount)) : 0;
-    const taxLine = budget?.lines.find((l) => l.tier === 'tax')?.amount ?? 0;
-    const prevTax = prevBudget?.lines.find((l) => l.tier === 'tax')?.amount ?? null;
 
     const savingsEnvs = f.envelopes.filter((e) => e.tier === 'savings' && !e.archived);
     const savings = sumCents(savingsEnvs.map((e) => f.balances.get(e.id) ?? 0));
@@ -97,12 +93,11 @@ export function DashboardPage() {
     const openDebts = f.debts.filter((d) => !d.closed && (f.debtBalances.get(d.id) ?? 0) > 0);
     if (openDebts.length) alerts.push({ icon: HandCoins, tone: 'info', to: '/deudas', text: `${openDebts.length} deuda(s) o adelanto(s) pendiente(s): ${formatMoney(sumCents(openDebts.map((d) => f.debtBalances.get(d.id) ?? 0)))}.` });
 
-    return { payday, flowsNow, flowsPrev, hasPrev, budget, prevBudget, lastBudget, summary, budgeted, taxLine, prevTax, savings, savingsThisWeek, holdingValue, holdingCost, toInvest, goal, bills, alerts };
+    return { payday, flowsNow, flowsPrev, hasPrev, budget, lastBudget, summary, budgeted, savings, savingsThisWeek, holdingValue, holdingCost, toInvest, goal, bills, alerts };
   }, [f, settings]);
 
   if (!f.ready || !settings) return null;
   const { budget, summary, lastBudget } = data;
-  const taxBalance = f.balances.get('env_tax') ?? 0;
   const greeting = (() => {
     const h = new Date().getHours();
     return h < 12 ? 'Buenos días' : h < 20 ? 'Buenas tardes' : 'Buenas noches';
@@ -208,18 +203,12 @@ export function DashboardPage() {
           <Delta current={data.flowsNow.expenses} previous={data.hasPrev ? data.flowsPrev.expenses : null} goodWhenUp={false} className="mt-1.5" />
         </StatCard>
 
-        <StatCard icon={Landmark} title="Impuestos" tone="tax" to="/impuestos" badge={settings.taxMode === '1099' ? 'Estimación' : 'W-2'}>
-          <Money cents={taxBalance} className="text-2xl font-semibold" />
-          <p className="text-xs text-muted-foreground">
-            {settings.taxMode === '1099' ? (
-              <>
-                Acumulado · esta semana <Money cents={data.taxLine} />
-              </>
-            ) : (
-              'Tus impuestos se retienen en nómina'
-            )}
+        <StatCard icon={Layers} title="Apartado en sobres" tone="essential" to="/sobres">
+          <Money cents={f.reserved} className="text-2xl font-semibold" />
+          <p className="text-xs text-muted-foreground">Dinero reservado para facturas, gasolina, gastos y ahorro</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Esta semana <Money cents={summary && budget ? summary.totalAllocated : 0} sign />
           </p>
-          {settings.taxMode === '1099' && <Delta current={data.taxLine} previous={data.prevTax} className="mt-1" />}
         </StatCard>
 
         <StatCard icon={PiggyBank} title="Ahorros" tone="savings" to="/metas">
@@ -318,7 +307,7 @@ export function DashboardPage() {
             { to: '/sobres', label: 'Sobres', icon: Layers },
             { to: '/suscripciones', label: 'Suscripciones', icon: Repeat },
             { to: '/deudas', label: 'Deudas', icon: HandCoins },
-            { to: '/impuestos', label: 'Impuestos', icon: Landmark },
+            { to: '/trabajo', label: 'Millas', icon: Route },
             { to: '/inversiones', label: 'Inversiones', icon: TrendingUp },
             { to: '/estadisticas', label: 'Estadísticas', icon: ChartColumn }
           ].map((q) => (
@@ -343,7 +332,7 @@ function StatCard({
 }: {
   icon: LucideIcon;
   title: string;
-  tone: 'tax' | 'essential' | 'work' | 'debt' | 'living' | 'savings' | 'investment' | 'free';
+  tone: 'essential' | 'work' | 'debt' | 'living' | 'savings' | 'investment' | 'free';
   to: string;
   badge?: string;
   children: React.ReactNode;
