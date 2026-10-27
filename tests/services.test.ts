@@ -79,6 +79,16 @@ describe('flujo cobro → distribución → confirmación → almacenamiento', (
     expect((await balances()).get('env_tax')).toBe(27500 + 15000);
   });
 
+  it('semanas que cruzan de año: claves distintas y sin falsos duplicados', async () => {
+    const a = await confirmWeek(80000, '2026-12-25');
+    const b = await confirmWeek(60000, '2027-01-01');
+    expect(a.weekKey).toBe('2026-12-21');
+    expect(b.weekKey).toBe('2026-12-28');
+    expect(await db.budgets.count()).toBe(2);
+    // El jueves 31 dic pertenece a la misma semana que el viernes 1 ene
+    await expect(confirmWeek(10000, '2026-12-31')).rejects.toBeInstanceOf(DuplicateBudgetError);
+  });
+
   it('eliminar un presupuesto revierte ingreso y reservas', async () => {
     const b = await confirmWeek(80000, '2026-11-06');
     await deleteBudget(db, b.id);

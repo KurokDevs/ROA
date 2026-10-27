@@ -37,6 +37,12 @@
     --tier-savings: 152 65% 38%;
     --tier-investment: 45 92% 45%;
     --tier-free: 220 10% 62%;
+
+    /* Paleta de gráficos (validada para daltonismo) */
+    --viz-1: #2a78d6;
+    --viz-2: #eb6834;
+    --viz-3: #1baf7a;
+    --viz-grid: hsl(220 14% 90%);
   }
 
   .dark {
@@ -72,6 +78,11 @@
     --tier-savings: 152 62% 50%;
     --tier-investment: 45 95% 58%;
     --tier-free: 220 10% 45%;
+
+    --viz-1: #3987e5;
+    --viz-2: #d95926;
+    --viz-3: #199e70;
+    --viz-grid: hsl(223 16% 18%);
   }
 
   * {

@@ -80,6 +80,12 @@ export function nextWeekdayOnOrAfter(date: ISODate, targetWeekday: number): ISOD
   return addDays(date, diff);
 }
 
+/** Día de cobro más reciente en o antes de `today` (hoy si hoy es día de cobro). */
+export function lastPayday(today: ISODate, paydayWeekday: number): ISODate {
+  const diff = (weekday(today) - paydayWeekday + 7) % 7;
+  return addDays(today, -diff);
+}
+
 /** Día de cobro de la semana que contiene `date`. */
 export function paydayOfWeek(date: ISODate, paydayWeekday: number): ISODate {
   const start = weekStart(date);

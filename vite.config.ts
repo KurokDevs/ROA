@@ -31,6 +31,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,ico}'],
+        // Solo se precargan las fuentes latinas (español); el resto se descarga si hiciera falta.
+        globIgnores: ['**/inter-{cyrillic,cyrillic-ext,greek,greek-ext,vietnamese}-*.woff2'],
         navigateFallback: '/index.html',
         cleanupOutdatedCaches: true
       },
@@ -41,7 +43,16 @@ export default defineConfig({
     alias: { '@': path.resolve(__dirname, './src') }
   },
   build: {
-    chunkSizeWarningLimit: 1200
+    chunkSizeWarningLimit: 700,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          charts: ['recharts'],
+          data: ['dexie', 'dexie-react-hooks', 'decimal.js']
+        }
+      }
+    }
   },
   test: {
     environment: 'node',
