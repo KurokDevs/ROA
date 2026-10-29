@@ -57,7 +57,7 @@ export function WorkPage() {
         </NativeSelect>
       } />
 
-      <div className="flex gap-2 rounded-2xl border bg-muted/40 p-4 text-sm text-muted-foreground">
+      <div className="flex gap-2 rounded-xl border bg-muted/40 p-4 text-sm text-muted-foreground">
         <Info className="mt-0.5 size-4 shrink-0" />
         <p>Registra las millas de cada jornada y los gastos del trabajo (bolsa térmica, soporte del teléfono, peajes…). Se guardan aparte para que tengas el historial cuando lo necesites.</p>
       </div>

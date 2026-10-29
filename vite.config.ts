@@ -20,8 +20,8 @@ export default defineConfig({
         scope: '/',
         display: 'standalone',
         orientation: 'portrait',
-        background_color: '#0b0d12',
-        theme_color: '#0b0d12',
+        background_color: '#0a0a0a',
+        theme_color: '#0a0a0a',
         categories: ['finance', 'productivity'],
         icons: [
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
@@ -32,7 +32,7 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,ico}'],
         // Solo se precargan las fuentes latinas (español); el resto se descarga si hiciera falta.
-        globIgnores: ['**/inter-{cyrillic,cyrillic-ext,greek,greek-ext,vietnamese}-*.woff2'],
+        globIgnores: ['**/geist-{cyrillic,cyrillic-ext,vietnamese}-*.woff2', '**/geist-*-italic*.woff2'],
         navigateFallback: '/index.html',
         cleanupOutdatedCaches: true
       },

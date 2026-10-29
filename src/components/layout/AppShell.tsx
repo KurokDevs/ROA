@@ -30,32 +30,44 @@ export function AppShell() {
 
   return (
     <div className="min-h-dvh bg-background">
-      {/* Barra lateral (escritorio) */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r bg-card/60 px-3 py-5 backdrop-blur-xl lg:flex">
-        <div className="mb-6 px-3">
+      {/* Barra lateral (escritorio) — patrón de sidebar de Creative Tim UI */}
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
+        <div className="flex h-16 items-center px-4">
           <Logo />
         </div>
-        <nav className="flex flex-1 flex-col gap-0.5" aria-label="Principal">
-          {NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === '/'}
-              className={({ isActive }) =>
-                cn(
-                  'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
-                  isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-accent hover:text-foreground'
-                )
-              }
-            >
-              <item.icon className="size-[18px]" />
-              {item.label}
-            </NavLink>
+        <nav className="flex flex-1 flex-col gap-4 overflow-y-auto px-2 py-2" aria-label="Principal">
+          {[
+            { label: 'Principal', items: NAV_ITEMS.filter((i) => i.primary && i.to !== '/ajustes') },
+            { label: 'Herramientas', items: NAV_ITEMS.filter((i) => !i.primary) },
+            { label: 'Cuenta', items: NAV_ITEMS.filter((i) => i.to === '/ajustes') }
+          ].map((group) => (
+            <div key={group.label}>
+              <div className="flex h-8 items-center px-2 text-xs font-medium text-sidebar-foreground/70">{group.label}</div>
+              <ul className="flex flex-col gap-1">
+                {group.items.map((item) => (
+                  <li key={item.to}>
+                    <NavLink
+                      to={item.to}
+                      end={item.to === '/'}
+                      className={({ isActive }) =>
+                        cn(
+                          'flex h-9 items-center gap-2 rounded-md px-2 text-sm outline-none transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-ring [&>svg]:size-4 [&>svg]:shrink-0',
+                          isActive && 'bg-sidebar-accent font-medium text-sidebar-accent-foreground'
+                        )
+                      }
+                    >
+                      <item.icon />
+                      {item.label}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
         </nav>
-        <p className="px-3 text-[11px] leading-relaxed text-muted-foreground">
-          Datos guardados solo en este dispositivo. Haz copias de seguridad desde Ajustes.
-        </p>
+        <div className="m-2 rounded-lg border bg-card p-3 text-xs leading-relaxed text-muted-foreground shadow-sm">
+          <span className="font-medium text-foreground">Datos locales.</span> Se guardan solo en este dispositivo. Haz copias desde Ajustes.
+        </div>
       </aside>
 
       <div className="lg:pl-64">
@@ -75,7 +87,7 @@ export function AppShell() {
 
       {/* Navegación inferior (móvil) */}
       <nav
-        className="pb-safe fixed inset-x-0 bottom-0 z-30 border-t bg-card/80 backdrop-blur-xl backdrop-saturate-150 lg:hidden"
+        className="pb-safe fixed inset-x-0 bottom-0 z-30 border-t bg-background/85 backdrop-blur-xl backdrop-saturate-150 lg:hidden"
         aria-label="Principal"
       >
         <div className="mx-auto grid max-w-lg grid-cols-5">
@@ -87,13 +99,13 @@ export function AppShell() {
               className={({ isActive }) =>
                 cn(
                   'flex flex-col items-center gap-1 pb-2 pt-2.5 text-[10.5px] font-medium transition-colors active:scale-95',
-                  isActive ? 'text-primary' : 'text-muted-foreground'
+                  isActive ? 'text-foreground' : 'text-muted-foreground'
                 )
               }
             >
               {({ isActive }) => (
                 <>
-                  <span className={cn('flex h-7 w-12 items-center justify-center rounded-full transition-colors', isActive && 'bg-primary/10')}>
+                  <span className={cn('flex h-7 w-12 items-center justify-center rounded-md transition-colors', isActive && 'bg-accent')}>
                     <item.icon className="size-[21px]" strokeWidth={isActive ? 2.3 : 1.9} />
                   </span>
                   {item.label}

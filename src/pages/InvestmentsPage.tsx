@@ -54,7 +54,7 @@ export function InvestmentsPage() {
         }
       />
 
-      <div className="flex gap-2 rounded-2xl border bg-muted/40 p-4 text-sm text-muted-foreground">
+      <div className="flex gap-2 rounded-xl border bg-muted/40 p-4 text-sm text-muted-foreground">
         <Info className="mt-0.5 size-4 shrink-0" />
         <p>
           Los valores son los que tú registras. No hay promesas de rendimiento: las inversiones pueden perder valor. El dinero que necesitarás en los próximos 1–2 años (facturas, emergencias, el carro)

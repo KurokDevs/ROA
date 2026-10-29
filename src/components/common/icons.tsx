@@ -85,14 +85,11 @@ export const TIER_COLOR: Record<Tier | 'free', string> = {
 
 export function EnvelopeIcon({ icon, tier, className, size = 'md' }: { icon: string; tier: Tier; className?: string; size?: 'sm' | 'md' | 'lg' }) {
   const Icon = ENVELOPE_ICONS[icon] ?? Wallet;
-  const dims = size === 'sm' ? 'size-8 rounded-lg' : size === 'lg' ? 'size-12 rounded-2xl' : 'size-10 rounded-xl';
+  // Caja de icono al estilo Creative Tim UI: neutra, con borde y sombra; el color va en el icono.
+  const dims = size === 'sm' ? 'size-9 rounded-lg' : size === 'lg' ? 'size-12 rounded-xl' : 'size-10 rounded-xl';
   return (
-    <span
-      className={cn('inline-flex shrink-0 items-center justify-center', dims, className)}
-      style={{ backgroundColor: `hsl(var(--tier-${tier}) / 0.16)`, color: TIER_COLOR[tier] }}
-      aria-hidden
-    >
-      <Icon className={size === 'lg' ? 'size-6' : 'size-[18px]'} />
+    <span className={cn('inline-flex shrink-0 items-center justify-center border bg-card shadow-sm', dims, className)} style={{ color: TIER_COLOR[tier] }} aria-hidden>
+      <Icon className={size === 'lg' ? 'size-6' : size === 'sm' ? 'size-4' : 'size-5'} />
     </span>
   );
 }

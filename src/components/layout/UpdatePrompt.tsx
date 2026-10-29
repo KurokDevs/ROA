@@ -10,7 +10,7 @@ export function UpdatePrompt() {
   } = useRegisterSW();
   if (!needRefresh) return null;
   return (
-    <div className="fixed inset-x-4 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-50 mx-auto max-w-md animate-fade-up rounded-2xl border bg-card p-4 shadow-2xl lg:bottom-6">
+    <div className="fixed inset-x-4 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-50 mx-auto max-w-md animate-fade-up rounded-xl border bg-card p-4 shadow-2xl lg:bottom-6">
       <div className="flex items-center gap-3">
         <RefreshCw className="size-5 text-primary" />
         <p className="flex-1 text-sm">Hay una nueva versión de ROA Finance.</p>

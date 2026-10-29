@@ -31,7 +31,7 @@ export function DistributionBar({ byTier, unassigned, total, showLegend = true, 
         ))}
       </div>
       {showLegend && segments.length > 0 && (
-        <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs sm:grid-cols-4">
+        <ul className="mt-3 grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs sm:grid-cols-3">
           {segments.map((s) => (
             <li key={s.tier} className="flex min-w-0 items-center gap-1.5">
               <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: TIER_COLOR[s.tier] }} />

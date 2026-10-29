@@ -6,7 +6,7 @@ const Tabs = TabsPrimitive.Root;
 
 const TabsList = React.forwardRef<React.ElementRef<typeof TabsPrimitive.List>, React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>>(
   ({ className, ...props }, ref) => (
-    <TabsPrimitive.List ref={ref} className={cn('no-scrollbar inline-flex h-10 max-w-full items-center gap-1 overflow-x-auto rounded-xl bg-muted p-1 text-muted-foreground', className)} {...props} />
+    <TabsPrimitive.List ref={ref} className={cn('no-scrollbar inline-flex h-9 w-fit max-w-full items-center justify-center overflow-x-auto rounded-lg bg-muted p-[3px] text-muted-foreground', className)} {...props} />
   )
 );
 TabsList.displayName = TabsPrimitive.List.displayName;
@@ -16,7 +16,7 @@ const TabsTrigger = React.forwardRef<React.ElementRef<typeof TabsPrimitive.Trigg
     <TabsPrimitive.Trigger
       ref={ref}
       className={cn(
-        'inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm',
+        'inline-flex h-full flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent px-3 py-1 text-sm font-medium text-foreground transition-[color,box-shadow] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:shadow-sm dark:text-muted-foreground dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 dark:data-[state=active]:text-foreground',
         className
       )}
       {...props}

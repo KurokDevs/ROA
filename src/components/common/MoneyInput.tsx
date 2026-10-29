@@ -19,9 +19,9 @@ export const MoneyInput = React.forwardRef<
     onValueChange(v);
   };
   const sizes = {
-    default: 'h-11 text-base pl-7',
+    default: 'h-10 text-base pl-7',
     lg: 'h-14 text-2xl font-semibold pl-9',
-    xl: 'h-20 text-5xl font-semibold tracking-tight pl-12'
+    xl: 'h-20 rounded-lg text-5xl font-bold tracking-tight pl-12'
   };
   const prefix = { default: 'left-3 text-base', lg: 'left-3.5 text-2xl', xl: 'left-4 text-4xl' };
   return (
@@ -36,7 +36,7 @@ export const MoneyInput = React.forwardRef<
         value={value}
         onChange={handle}
         className={cn(
-          'tabular flex w-full rounded-xl border border-input bg-background pr-3 shadow-sm transition-colors placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          'tabular flex w-full rounded-md border border-input bg-transparent pr-3 shadow-sm outline-none transition-[color,box-shadow] placeholder:text-muted-foreground/60 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30',
           sizes[size],
           className
         )}

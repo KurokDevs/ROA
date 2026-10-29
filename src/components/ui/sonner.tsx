@@ -10,7 +10,7 @@ export function Toaster() {
       offset="calc(env(safe-area-inset-top) + 12px)"
       toastOptions={{
         classNames: {
-          toast: 'rounded-2xl border bg-card text-card-foreground shadow-xl',
+          toast: 'rounded-lg border bg-popover text-popover-foreground shadow-lg',
           description: 'text-muted-foreground'
         }
       }}

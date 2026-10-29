@@ -3,31 +3,39 @@
 @tailwind utilities;
 
 @layer base {
+  /* Paleta neutra de Creative Tim UI (shadcn new-york, base neutral) */
   :root {
-    --background: 220 20% 97%;
-    --foreground: 224 30% 10%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
-    --card-foreground: 224 30% 10%;
+    --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 224 30% 10%;
-    --primary: 160 84% 30%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 16% 93%;
-    --secondary-foreground: 224 30% 14%;
-    --muted: 220 16% 94%;
-    --muted-foreground: 222 10% 40%;
-    --accent: 220 16% 92%;
-    --accent-foreground: 224 30% 12%;
-    --destructive: 0 72% 46%;
-    --destructive-foreground: 0 0% 100%;
-    --success: 152 70% 32%;
-    --success-foreground: 0 0% 100%;
-    --warning: 34 92% 40%;
-    --warning-foreground: 0 0% 100%;
-    --border: 220 14% 88%;
-    --input: 220 14% 86%;
-    --ring: 160 84% 30%;
-    --radius: 0.9rem;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 142 72% 29%;
+    --success-foreground: 0 0% 98%;
+    --warning: 32 95% 40%;
+    --warning-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 63.9%;
+    --radius: 0.625rem;
+    --surface: 0 0% 98%;
+
+    --sidebar: 0 0% 98%;
+    --sidebar-foreground: 0 0% 3.9%;
+    --sidebar-accent: 0 0% 96.1%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 89.8%;
 
     --tier-essential: 217 85% 52%;
     --tier-work: 28 92% 50%;
@@ -41,33 +49,40 @@
     --viz-1: #2a78d6;
     --viz-2: #eb6834;
     --viz-3: #1baf7a;
-    --viz-grid: hsl(220 14% 90%);
+    --viz-grid: hsl(0 0% 92%);
   }
 
   .dark {
-    --background: 225 25% 5%;
-    --foreground: 220 20% 96%;
-    --card: 224 20% 9%;
-    --card-foreground: 220 20% 96%;
-    --popover: 224 20% 10%;
-    --popover-foreground: 220 20% 96%;
-    --primary: 158 72% 46%;
-    --primary-foreground: 225 30% 6%;
-    --secondary: 223 16% 15%;
-    --secondary-foreground: 220 20% 94%;
-    --muted: 223 16% 14%;
-    --muted-foreground: 220 10% 64%;
-    --accent: 223 16% 16%;
-    --accent-foreground: 220 20% 96%;
-    --destructive: 0 75% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --success: 152 62% 48%;
-    --success-foreground: 225 30% 6%;
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 14.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 89.8%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 20%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84% 65%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 142 69% 52%;
+    --success-foreground: 0 0% 9%;
     --warning: 38 95% 58%;
-    --warning-foreground: 225 30% 6%;
-    --border: 223 16% 17%;
-    --input: 223 16% 20%;
-    --ring: 158 72% 46%;
+    --warning-foreground: 0 0% 9%;
+    --border: 0 0% 16%;
+    --input: 0 0% 20%;
+    --ring: 0 0% 45.1%;
+    --surface: 0 0% 7.8%;
+
+    --sidebar: 0 0% 9%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 14.9%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 16%;
 
     --tier-essential: 214 90% 64%;
     --tier-work: 28 95% 60%;
@@ -80,7 +95,7 @@
     --viz-1: #3987e5;
     --viz-2: #d95926;
     --viz-3: #199e70;
-    --viz-grid: hsl(223 16% 18%);
+    --viz-grid: hsl(0 0% 18%);
   }
 
   * {
@@ -92,8 +107,14 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  ::selection {
+    @apply bg-foreground text-background;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
     font-feature-settings: 'cv11', 'ss01', 'tnum';
     overscroll-behavior-y: none;
   }

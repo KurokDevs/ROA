@@ -103,9 +103,9 @@ export function StatsPage() {
         title="Estadísticas"
         subtitle="Tus semanas, gastos, ahorro y patrimonio"
         action={
-          <div className="flex rounded-xl bg-muted p-1">
+          <div className="flex rounded-lg bg-muted p-[3px]">
             {RANGES.map((r) => (
-              <button key={r} onClick={() => setRange(r)} className={cn('rounded-lg px-2.5 py-1 text-xs font-medium transition', range === r ? 'bg-card shadow-sm' : 'text-muted-foreground')}>
+              <button key={r} onClick={() => setRange(r)} className={cn('rounded-md px-2.5 py-1 text-xs font-medium transition', range === r ? 'bg-background shadow-sm dark:bg-input/30' : 'text-muted-foreground')}>
                 {r}s
               </button>
             ))}
@@ -242,7 +242,7 @@ export function StatsPage() {
                 { key: 'low', label: 'Baja', icon: Snowflake, data: d.season.low },
                 { key: 'high', label: 'Alta', icon: Sun, data: d.season.high }
               ].map((s) => (
-                <div key={s.key} className="rounded-2xl bg-muted/50 p-4">
+                <div key={s.key} className="rounded-xl bg-muted/50 p-4">
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <s.icon className="size-3.5" /> {s.label} · {s.data.weeks} sem.
                   </div>
@@ -291,7 +291,7 @@ export function StatsPage() {
           </Field>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {sims.map((s) => (
-              <div key={s.months} className="rounded-2xl bg-muted/50 p-3">
+              <div key={s.months} className="rounded-xl bg-muted/50 p-3">
                 <div className="text-xs text-muted-foreground">{s.months} meses · hipotético</div>
                 <Money cents={s.final.total} className="block text-lg font-semibold" />
                 <div className="text-[11px] text-muted-foreground">

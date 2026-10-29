@@ -21,7 +21,7 @@ export function applyTheme(pref: ThemePref = readPref()) {
   const root = document.documentElement;
   root.classList.toggle('dark', !!dark);
   const meta = document.querySelector('meta[name="theme-color"]');
-  meta?.setAttribute('content', dark ? '#0b0d12' : '#f5f6f8');
+  meta?.setAttribute('content', dark ? '#0a0a0a' : '#ffffff');
 }
 
 export function setThemePref(pref: ThemePref) {

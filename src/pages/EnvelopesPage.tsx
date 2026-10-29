@@ -276,7 +276,7 @@ function EnvelopeDetail({ env, f, onEdit, onMove, onSpend }: { env: Envelope; f:
           </div>
         </div>
       </DialogHeader>
-      <div className="grid grid-cols-3 gap-2 rounded-2xl bg-muted/50 p-3 text-center">
+      <div className="grid grid-cols-3 gap-2 rounded-xl bg-muted/50 p-3 text-center">
         <div>
           <div className="text-[11px] text-muted-foreground">Saldo reservado</div>
           <Money cents={balance} className="font-semibold" />

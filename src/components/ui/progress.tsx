@@ -9,7 +9,7 @@ interface ProgressProps extends React.ComponentPropsWithoutRef<typeof ProgressPr
 
 const Progress = React.forwardRef<React.ElementRef<typeof ProgressPrimitive.Root>, ProgressProps>(
   ({ className, value, indicatorClassName, indicatorStyle, ...props }, ref) => (
-    <ProgressPrimitive.Root ref={ref} className={cn('relative h-2 w-full overflow-hidden rounded-full bg-secondary', className)} value={value} {...props}>
+    <ProgressPrimitive.Root ref={ref} className={cn('relative h-2 w-full overflow-hidden rounded-full bg-primary/15', className)} value={value} {...props}>
       <ProgressPrimitive.Indicator
         className={cn('h-full w-full flex-1 rounded-full bg-primary transition-transform duration-700 ease-out', indicatorClassName)}
         style={{ transform: `translateX(-${100 - Math.max(0, Math.min(100, value ?? 0))}%)`, ...indicatorStyle }}

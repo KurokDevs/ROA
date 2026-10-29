@@ -208,7 +208,6 @@ function Organizer({
     <div className="space-y-6">
       <Card className="overflow-hidden animate-fade-up">
         <div className="relative">
-          <div className="pointer-events-none absolute -right-16 -top-24 size-64 rounded-full bg-primary/15 blur-3xl" />
           <form onSubmit={calculate} className="relative space-y-5 p-5 sm:p-7">
             <div>
               <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{existing ? 'Editar el cobro de esta semana' : '¿Cuánto cobraste esta semana?'}</h2>
@@ -434,7 +433,6 @@ function ConfirmedBudget({ budget, finance, onEdit }: { budget: WeeklyBudget; fi
     <div className="space-y-4 animate-fade-up">
       <Card className="overflow-hidden">
         <div className="relative p-5 sm:p-7">
-          <div className="pointer-events-none absolute -right-20 -top-20 size-64 rounded-full bg-primary/15 blur-3xl" />
           <div className="relative flex flex-wrap items-start justify-between gap-3">
             <div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -446,7 +444,7 @@ function ConfirmedBudget({ budget, finance, onEdit }: { budget: WeeklyBudget; fi
             <ModeBadge mode={budget.mode} />
           </div>
           <DistributionBar className="relative mt-5" byTier={summary.byTier} unassigned={summary.unassigned} total={budget.income} />
-          <div className="relative mt-5 grid grid-cols-3 gap-3 rounded-2xl bg-muted/50 p-3 text-center">
+          <div className="relative mt-5 grid grid-cols-3 gap-3 rounded-xl bg-muted/50 p-3 text-center">
             <div>
               <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Apartado</div>
               <Money cents={summary.totalAllocated} className="font-semibold" />

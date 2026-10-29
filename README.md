@@ -11,7 +11,7 @@ Aplicación web progresiva (PWA) de finanzas personales para ingresos semanales 
 
 ## Stack
 
-React 18 + TypeScript · Vite 6 · Tailwind CSS 3 · componentes shadcn/ui (Radix) · Lucide · Recharts · Dexie.js (IndexedDB) · decimal.js · vite-plugin-pwa (Workbox) · React Router · Vitest.
+React 18 + TypeScript · Vite 6 · Tailwind CSS 3 · componentes shadcn/ui (Radix) con el diseño de [Creative Tim UI](https://github.com/creativetimofficial/ui) (MIT, ver `THIRD_PARTY_NOTICES.md`) · fuente Geist · Lucide · Recharts · Dexie.js (IndexedDB) · decimal.js · vite-plugin-pwa (Workbox) · React Router · Vitest.
 
 ## Instrucciones para Windows
 

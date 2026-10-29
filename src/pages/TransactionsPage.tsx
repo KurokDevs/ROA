@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { addDays, addMonths, formatDateLong, formatMonth, formatWeekRange, monthKey, weekStart } from '@/lib/dates';
 import { cn } from '@/lib/utils';
+import { formatMoney } from '@/lib/money';
 import { flowTotals } from '@/engine/ledger';
 import { CATEGORIES, TX_TYPE_LABELS, type Transaction, type TxType } from '@/models/types';
 import { deleteTransaction } from '@/services/transactionService';
@@ -138,12 +139,12 @@ export function TransactionsPage() {
 
       <Card className="space-y-3 p-3 sm:p-4">
         <div className="flex items-center gap-2">
-          <div className="flex rounded-xl bg-muted p-1">
+          <div className="flex rounded-lg bg-muted p-[3px]">
             {(['week', 'month', 'all'] as Period[]).map((p) => (
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
-                className={cn('rounded-lg px-3 py-1.5 text-sm font-medium transition', period === p ? 'bg-card shadow-sm' : 'text-muted-foreground')}
+                className={cn('rounded-md px-3 py-1 text-sm font-medium transition', period === p ? 'bg-background shadow-sm dark:bg-input/30' : 'text-muted-foreground')}
               >
                 {p === 'week' ? 'Semana' : p === 'month' ? 'Mes' : 'Todo'}
               </button>
@@ -154,7 +155,7 @@ export function TransactionsPage() {
               <Button variant="ghost" size="icon" onClick={() => shift(-1)} aria-label="Anterior">
                 <ChevronLeft />
               </Button>
-              <span className="min-w-28 text-center text-sm font-medium capitalize">{range.label}</span>
+              <span className="min-w-28 text-center text-sm font-medium first-letter:uppercase">{range.label}</span>
               <Button variant="ghost" size="icon" onClick={() => shift(1)} aria-label="Siguiente">
                 <ChevronRight />
               </Button>
@@ -218,49 +219,61 @@ export function TransactionsPage() {
         />
       ) : (
         <div className="space-y-4">
-          {groups.map(([date, txs]) => (
-            <section key={date}>
-              <h3 className="mb-1.5 px-1 text-xs font-semibold capitalize text-muted-foreground">{formatDateLong(date)}</h3>
-              <Card className="divide-y">
-                {txs.map((t) => {
-                  const Icon = t.isBusiness ? Briefcase : TYPE_ICON[t.type];
-                  const sign = signOf(t);
-                  return (
-                    <div key={t.id} className="group flex items-center gap-3 p-3 sm:px-4">
-                      <span
-                        className={cn(
-                          'flex size-9 shrink-0 items-center justify-center rounded-xl',
-                          sign > 0 ? 'bg-success/10 text-success' : sign < 0 ? 'bg-muted text-foreground' : 'bg-primary/10 text-primary'
-                        )}
-                      >
-                        <Icon className="size-4" />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-medium">{t.description || t.category || TX_TYPE_LABELS[t.type]}</div>
-                        <div className="truncate text-xs text-muted-foreground">
-                          {TX_TYPE_LABELS[t.type]} · {accName(t.accountId)}
-                          {t.toAccountId && ` → ${accName(t.toAccountId)}`}
-                          {envName(t.envelopeId) && ` · sobre ${envName(t.envelopeId)}`}
-                          {t.budgetId && ' · presupuesto semanal'}
+          {/* Patrón del bloque transaction-history-01 de Creative Tim UI */}
+          <Card className="p-4 sm:p-6">
+            <div>
+              <h2 className="font-semibold">Historial de movimientos</h2>
+              <p className="text-sm text-muted-foreground">Sigue y controla tu actividad financiera.</p>
+            </div>
+            <div className="mt-6">
+              {groups.map(([date, txs]) => (
+                <div key={date} className="mb-6 last:mb-0">
+                  <p className="mb-2 ml-2.5 font-semibold text-muted-foreground first-letter:uppercase">{formatDateLong(date)}</p>
+                  <div className="space-y-2">
+                    {txs.map((t) => {
+                      const Icon = t.isBusiness ? Briefcase : TYPE_ICON[t.type];
+                      const sign = signOf(t);
+                      return (
+                        <div key={t.id} className="flex items-center gap-3 rounded-lg border p-3 sm:gap-4 sm:p-4">
+                          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border bg-card text-card-foreground shadow-sm sm:size-12">
+                            <Icon className={cn('size-5', sign > 0 ? 'text-green-600 dark:text-green-500' : sign < 0 ? 'text-red-600 dark:text-red-500' : 'text-foreground')} />
+                          </div>
+                          <div className="min-w-0 flex-1 space-y-0.5 sm:mx-2">
+                            <p className="truncate font-semibold">{t.description || t.category || TX_TYPE_LABELS[t.type]}</p>
+                            <p className="truncate text-sm text-muted-foreground">
+                              {TX_TYPE_LABELS[t.type]} · {accName(t.accountId)}
+                              {t.toAccountId && ` → ${accName(t.toAccountId)}`}
+                              {envName(t.envelopeId) && ` · sobre ${envName(t.envelopeId)}`}
+                              {t.budgetId && ' · presupuesto semanal'}
+                            </p>
+                          </div>
+                          <p
+                            className={cn(
+                              'tabular ml-auto whitespace-nowrap text-sm font-semibold',
+                              sign > 0 ? 'text-green-600 dark:text-green-500' : sign < 0 ? 'text-red-600 dark:text-red-500' : 'text-muted-foreground'
+                            )}
+                          >
+                            {sign > 0 ? '+ ' : sign < 0 ? '- ' : ''}
+                            {formatMoney(t.amount)}
+                          </p>
+                          {!t.budgetId && (
+                            <div className="flex">
+                              <Button variant="ghost" size="icon" className="size-8" onClick={() => setDialog({ open: true, editing: t })} aria-label="Editar">
+                                <Pencil className="size-3.5" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-destructive" onClick={() => setToDelete(t)} aria-label="Eliminar">
+                                <Trash2 className="size-3.5" />
+                              </Button>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                      <Money cents={sign < 0 ? -t.amount : t.amount} className={cn('text-sm font-semibold', sign > 0 && 'text-success', sign === 0 && 'text-muted-foreground')} sign={sign > 0} />
-                      {!t.budgetId && (
-                        <div className="flex">
-                          <Button variant="ghost" size="icon" className="size-8" onClick={() => setDialog({ open: true, editing: t })} aria-label="Editar">
-                            <Pencil className="size-3.5" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-destructive" onClick={() => setToDelete(t)} aria-label="Eliminar">
-                            <Trash2 className="size-3.5" />
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </Card>
-            </section>
-          ))}
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
           <Button variant="outline" className="w-full" onClick={exportCsv}>
             <Download /> Exportar CSV ({filtered.length})
           </Button>

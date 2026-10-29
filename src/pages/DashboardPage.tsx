@@ -24,11 +24,12 @@ import { db } from '@/db';
 import { useFinance } from '@/hooks/useFinance';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { BalanceCard } from '@/components/common/BalanceCard';
 import { Progress } from '@/components/ui/progress';
 import { Money } from '@/components/common/Money';
 import { Delta } from '@/components/common/Delta';
 import { DistributionBar } from '@/components/common/DistributionBar';
-import { ModeBadge } from '@/components/common/ModeBadge';
 import { EnvelopeIcon } from '@/components/common/icons';
 import { LogoMark } from '@/components/layout/Logo';
 import { addDays, diffDays, formatDateShort, formatWeekRange, formatWeekdayLong, lastPayday, weekStart } from '@/lib/dates';
@@ -109,13 +110,13 @@ export function DashboardPage() {
       <header className="flex items-center justify-between animate-fade-up">
         <div>
           <p className="text-sm text-muted-foreground first-letter:uppercase">{formatWeekdayLong(f.today)}</p>
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{greeting}</h1>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{greeting}</h1>
         </div>
         <LogoMark className="size-10 lg:hidden" />
       </header>
 
       {!settings.onboarded && f.budgets.length === 0 && (
-        <Card className="border-primary/30 bg-primary/5 animate-fade-up">
+        <Card className="bg-surface animate-fade-up">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="size-5 text-primary" /> Bienvenido a ROA Finance
@@ -138,60 +139,55 @@ export function DashboardPage() {
         </Card>
       )}
 
-      {/* Resumen financiero + CTA semanal */}
-      <Card className="relative overflow-hidden animate-fade-up">
-        <div className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-primary/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-32 -left-16 size-72 rounded-full bg-tier-essential/10 blur-3xl" />
-        <div className="relative p-5 sm:p-7">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Saldo disponible</p>
-              <Money cents={f.available} className={cn('mt-1 block text-4xl font-semibold tracking-tight sm:text-5xl', f.available < 0 && 'text-destructive')} />
-              <p className="mt-1 text-xs text-muted-foreground">
-                Dinero libre después de apartar compromisos · en cuentas <Money cents={f.liquid} /> · apartado <Money cents={f.reserved} />
-              </p>
-            </div>
-            {lastBudget && <ModeBadge mode={lastBudget.mode} />}
-          </div>
+      {/* Tarjeta de saldo (bloque card-display-01 de Creative Tim UI) + resumen financiero */}
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,26rem)_1fr]">
+        <BalanceCard available={f.available} liquid={f.liquid} reserved={f.reserved} mode={lastBudget?.mode} />
 
-          {summary && lastBudget ? (
-            <div className="mt-6">
-              <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
-                <span>Distribución {budget ? 'de esta semana' : `de la semana ${formatWeekRange(lastBudget.weekKey)}`}</span>
-                <Money cents={lastBudget.income} className="font-medium text-foreground" />
+        <Card className="flex flex-col animate-fade-up">
+          <CardHeader className="pb-4">
+            <CardTitle>Resumen financiero</CardTitle>
+            <CardDescription>
+              {summary && lastBudget ? `Cómo se dividió el cobro ${budget ? 'de esta semana' : `de la semana ${formatWeekRange(lastBudget.weekKey)}`}` : 'Aún no hay cobros confirmados'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-1 flex-col justify-between gap-5">
+            {summary && lastBudget ? (
+              <div>
+                <div className="mb-3 flex items-baseline justify-between">
+                  <span className="text-sm text-muted-foreground">Ingreso</span>
+                  <Money cents={lastBudget.income} className="text-xl font-bold" />
+                </div>
+                <DistributionBar byTier={summary.byTier} unassigned={summary.unassigned} total={lastBudget.income} />
               </div>
-              <DistributionBar byTier={summary.byTier} unassigned={summary.unassigned} total={lastBudget.income} />
-            </div>
-          ) : null}
-
-          {!budget && (
-            <Link
-              to="/semana"
-              className="group mt-6 flex items-center gap-4 rounded-2xl bg-primary p-4 text-primary-foreground shadow-lg shadow-primary/20 transition active:scale-[0.99]"
-            >
-              <span className="flex size-11 items-center justify-center rounded-xl bg-white/15">
-                <CalendarDays className="size-6" />
-              </span>
-              <span className="flex-1">
-                <span className="block text-base font-semibold">¿Cuánto cobraste esta semana?</span>
-                <span className="block text-sm opacity-85">Calcula en segundos qué apartar para cada cosa</span>
-              </span>
-              <ArrowRight className="size-5 transition group-hover:translate-x-1" />
-            </Link>
-          )}
-        </div>
-      </Card>
+            ) : (
+              <p className="text-sm text-muted-foreground">Cuando confirmes tu primer cobro verás aquí cómo se reparte entre facturas, trabajo, gastos y ahorro.</p>
+            )}
+            {!budget && (
+              <Link to="/semana" className="group flex items-center gap-4 rounded-lg border p-4 shadow-sm transition hover:bg-accent/50 active:scale-[0.99]">
+                <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+                  <CalendarDays className="size-5" />
+                </span>
+                <span className="flex-1">
+                  <span className="block font-semibold">¿Cuánto cobraste esta semana?</span>
+                  <span className="block text-sm text-muted-foreground">Calcula en segundos qué apartar para cada cosa</span>
+                </span>
+                <ArrowRight className="size-5 text-muted-foreground transition group-hover:translate-x-1" />
+              </Link>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Tarjetas principales */}
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         <StatCard icon={Wallet} title="Ingreso semanal" tone="essential" to="/semana">
-          <Money cents={data.flowsNow.income} className="text-2xl font-semibold" />
+          <Money cents={data.flowsNow.income} className="text-2xl font-bold" />
           <Delta current={data.flowsNow.income} previous={data.hasPrev ? data.flowsPrev.income : null} className="mt-1" />
         </StatCard>
 
         <StatCard icon={Receipt} title="Gastos" tone="living" to="/movimientos">
           <div className="flex items-baseline gap-1.5">
-            <Money cents={data.flowsNow.expenses} className="text-2xl font-semibold" />
+            <Money cents={data.flowsNow.expenses} className="text-2xl font-bold" />
             <span className="text-sm text-muted-foreground">
               de <Money cents={data.budgeted} /> presupuestado
             </span>
@@ -205,7 +201,7 @@ export function DashboardPage() {
         </StatCard>
 
         <StatCard icon={Layers} title="Apartado en sobres" tone="essential" to="/sobres">
-          <Money cents={f.reserved} className="text-2xl font-semibold" />
+          <Money cents={f.reserved} className="text-2xl font-bold" />
           <p className="text-xs text-muted-foreground">Dinero reservado para facturas, gasolina, gastos y ahorro</p>
           <p className="mt-1 text-xs text-muted-foreground">
             Esta semana <Money cents={summary && budget ? summary.totalAllocated : 0} sign />
@@ -213,7 +209,7 @@ export function DashboardPage() {
         </StatCard>
 
         <StatCard icon={PiggyBank} title="Ahorros" tone="savings" to="/metas">
-          <Money cents={data.savings} className="text-2xl font-semibold" />
+          <Money cents={data.savings} className="text-2xl font-bold" />
           {data.goal ? (
             <>
               <div className="mt-1 flex justify-between text-xs text-muted-foreground">
@@ -231,7 +227,7 @@ export function DashboardPage() {
         </StatCard>
 
         <StatCard icon={TrendingUp} title="Inversiones" tone="investment" to="/inversiones">
-          <Money cents={data.holdingValue} className="text-2xl font-semibold" />
+          <Money cents={data.holdingValue} className="text-2xl font-bold" />
           <p className="text-xs text-muted-foreground">
             Aportado <Money cents={data.holdingCost} /> · rendimiento <Money cents={data.holdingValue - data.holdingCost} colored sign />
           </p>
@@ -241,7 +237,7 @@ export function DashboardPage() {
         </StatCard>
 
         <StatCard icon={ShieldCheck} title="Patrimonio neto" tone="free" to="/estadisticas">
-          <Money cents={f.worth.netWorth} className="text-2xl font-semibold" />
+          <Money cents={f.worth.netWorth} className="text-2xl font-bold" />
           <p className="text-xs text-muted-foreground">
             Cuentas <Money cents={f.worth.cash} /> + inversiones <Money cents={f.worth.investments} /> − deudas <Money cents={f.worth.debts} />
           </p>
@@ -267,7 +263,7 @@ export function DashboardPage() {
       <section className="space-y-2">
         <div className="flex items-center justify-between px-1">
           <h2 className="text-sm font-semibold text-muted-foreground">Facturas próximas</h2>
-          <Link to="/sobres" className="text-xs font-medium text-primary">
+          <Link to="/sobres" className="text-xs font-medium underline-offset-4 hover:underline">
             Ver sobres
           </Link>
         </div>
@@ -312,7 +308,7 @@ export function DashboardPage() {
             { to: '/inversiones', label: 'Inversiones', icon: TrendingUp },
             { to: '/estadisticas', label: 'Estadísticas', icon: ChartColumn }
           ].map((q) => (
-            <Link key={q.to} to={q.to} className="flex flex-col items-center gap-2 rounded-2xl border bg-card p-3 text-xs font-medium transition active:scale-95">
+            <Link key={q.to} to={q.to} className="flex flex-col items-center gap-2 rounded-xl border bg-card p-3 text-xs font-medium transition active:scale-95">
               <q.icon className="size-5 text-primary" />
               {q.label}
             </Link>
@@ -340,13 +336,13 @@ function StatCard({
 }) {
   return (
     <Link to={to} className="group block animate-fade-up">
-      <Card className="h-full p-4 transition group-hover:border-primary/30 group-active:scale-[0.99] sm:p-5">
-        <div className="mb-3 flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-lg" style={{ backgroundColor: `hsl(var(--tier-${tone}) / 0.15)`, color: `hsl(var(--tier-${tone}))` }}>
-            <Icon className="size-4" />
+      <Card className="h-full p-5 transition group-hover:shadow-md group-active:scale-[0.99] sm:p-6">
+        <div className="mb-4 flex items-center gap-3">
+          <span className="flex size-10 items-center justify-center rounded-xl border bg-card shadow-sm" style={{ color: `hsl(var(--tier-${tone}))` }}>
+            <Icon className="size-5" />
           </span>
-          <span className="text-sm font-medium text-muted-foreground">{title}</span>
-          {badge && <span className="ml-auto rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">{badge}</span>}
+          <span className="text-sm font-semibold">{title}</span>
+          {badge && <Badge variant="secondary" className="ml-auto">{badge}</Badge>}
         </div>
         {children}
       </Card>
