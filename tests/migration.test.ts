@@ -36,6 +36,8 @@ describe('migración v2: se elimina la reserva de impuestos', () => {
     const bal = envelopeBalances(await db.entries.toArray(), []);
     expect(bal.get('env_tax')).toBeUndefined();
     expect(bal.get('env_rent')).toBe(10000);
+    // v3 añade el sobre de peajes a quien ya tenía datos
+    expect((await db.envelopes.get('env_tolls'))?.weeklyAmount).toBe(1500);
     db.close();
   });
 });

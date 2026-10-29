@@ -86,7 +86,7 @@ El resultado queda en la carpeta `dist/`.
 Cálculo determinista y comprobable (`src/engine/allocation.ts`), sin IA ni aleatoriedad. Orden estricto de prioridades; un nivel solo recibe dinero si todos los anteriores quedaron cubiertos:
 
 1. **Esenciales** — alquiler, teléfono, seguro, electricidad…
-2. **Trabajo y vehículo** — gasolina y mantenimiento del carro.
+2. **Trabajo y vehículo** — gasolina, peajes (tollways) y mantenimiento del carro.
 3. **Pagos pendientes** — deudas y adelantos (pago semanal pactado o el saldo completo si vence esa semana).
 4. **Vida diaria** — personal, pareja, suscripciones que siguen cobrando.
 5. **Ahorro** — fondo de emergencia, fondo del carro, objetivos.
@@ -107,7 +107,7 @@ Cálculo determinista y comprobable (`src/engine/allocation.ts`), sin IA ni alea
 - **Presupuesto semanal (gasolina, personal, pareja):** rellena hasta la cantidad semanal teniendo en cuenta lo que sobró.
 - **Ahorro:** aportación semanal hasta alcanzar el objetivo.
 
-Ejemplos con la configuración inicial: $400 → Supervivencia (déficit de $34.01); $500 → Estabilidad con $2.99 libres; $800 → Estabilidad con $152.99 libres; $1,100 → Estabilidad, y Crecimiento (≈ $303 para invertir) cuando el fondo de emergencia supera $500.
+Ejemplos con la configuración inicial: $400 → Supervivencia (déficit de $49.01); $500 → Estabilidad, todo a obligaciones y ahorro; $800 → Estabilidad con $145.49 libres; $1,100 → Estabilidad, y Crecimiento (≈ $295.50 para invertir) cuando el fondo de emergencia supera $500.
 
 Antes de confirmar puedes **editar cualquier importe**. Al confirmar se guarda de forma atómica (ingreso + reservas en sobres + presupuesto) con una **clave única por semana**, así un doble toque o un segundo intento nunca duplican. Después, en «Transferencias en tu banco», marcas qué reservas moviste realmente: el plan y la transferencia ejecutada son cosas distintas.
 
@@ -123,7 +123,8 @@ Antes de confirmar puedes **editar cualquier importe**. Al confirmar se guarda d
 | Gasolina | $150/semana | $150 |
 | Personal | $50/semana | $50 |
 | Pareja | $50/semana | $50 |
-| **Total** | | **$410** |
+| Peajes (tollways) | ~$15/semana | $15 |
+| **Total** | | **$425** |
 
 ROA añade además dos sobres sugeridos, editables o archivables: **Mantenimiento del carro** ($10/semana hasta $300) y **Suscripciones** (equivalente semanal de las que siguen cobrando: ~$14). Las facturas empiezan sin día de vencimiento; añádelo en Sobres para activar el cálculo por viernes restantes.
 
@@ -164,6 +165,6 @@ La UI nunca habla con la base de datos directamente para escribir: usa `src/serv
 
 ## Pruebas
 
-`npm test` ejecuta 65 pruebas: semanas de $400/$500/$600/$800/$1,100, déficit, facturas mensuales y meses de cinco viernes, pagos anticipados, adelantos y devoluciones, transferencias internas, cancelación de suscripciones, migración de datos, semanas que cruzan meses y años, edición de registros históricos, prevención de duplicados (incluido el doble toque), copias de seguridad y CSV.
+`npm test` ejecuta 66 pruebas: semanas de $400/$500/$600/$800/$1,100, déficit, facturas mensuales y meses de cinco viernes, pagos anticipados, adelantos y devoluciones, transferencias internas, cancelación de suscripciones, migración de datos, semanas que cruzan meses y años, edición de registros históricos, prevención de duplicados (incluido el doble toque), copias de seguridad y CSV.
 
 Iconos: `node scripts/generate-icons.mjs` regenera los PNG desde `public/favicon.svg` (requiere Playwright).

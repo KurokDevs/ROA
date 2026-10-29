@@ -75,6 +75,16 @@ export class RoaDB extends Dexie {
           delete st.taxRate;
         });
       });
+    // v3: nuevo sobre de peajes (tollways), $15/semana, para usuarios que ya tenían datos.
+    this.version(3)
+      .stores({})
+      .upgrade(async (tx) => {
+        if ((await tx.table('settings').count()) === 0) return;
+        if (await tx.table('envelopes').get('env_tolls')) return;
+        const tolls = defaultEnvelopes(new Date().toISOString()).find((e) => e.id === 'env_tolls');
+        if (tolls) await tx.table('envelopes').add(tolls);
+        await tx.table('envelopes').where('id').equals('env_maint').modify({ priority: 3 });
+      });
   }
 }
 

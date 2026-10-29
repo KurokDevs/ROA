@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildPlan, summarizeLines, validateLines } from '@/engine/allocation';
 import { amountOf, debt, planInput, seedEnvelopes } from './helpers';
 
-const OBLIGATIONS = ['env_rent', 'env_phone', 'env_insurance', 'env_gas', 'env_maint', 'env_personal', 'env_couple', 'env_subs'];
+const OBLIGATIONS = ['env_rent', 'env_phone', 'env_insurance', 'env_gas', 'env_tolls', 'env_maint', 'env_personal', 'env_couple', 'env_subs'];
 
 describe('organizador semanal con la configuración inicial', () => {
   it('semana de $400: Supervivencia con déficit, sin ahorro ni inversión', () => {
@@ -12,11 +12,12 @@ describe('organizador semanal con la configuración inicial', () => {
     expect(amountOf(r.lines, 'env_phone')).toBe(3000);
     expect(amountOf(r.lines, 'env_insurance')).toBe(3000);
     expect(amountOf(r.lines, 'env_gas')).toBe(15000);
+    expect(amountOf(r.lines, 'env_tolls')).toBe(1500);
     expect(amountOf(r.lines, 'env_maint')).toBe(1000);
     expect(amountOf(r.lines, 'env_personal')).toBe(5000);
-    expect(amountOf(r.lines, 'env_couple')).toBe(3000);
+    expect(amountOf(r.lines, 'env_couple')).toBe(1500);
     expect(amountOf(r.lines, 'env_subs')).toBe(0);
-    expect(r.deficit).toBe(2000 + 1401);
+    expect(r.deficit).toBe(3500 + 1401);
     expect(r.unassigned).toBe(0);
     expect(r.lines.some((l) => l.tier === 'savings' || l.tier === 'investment')).toBe(false);
     expect(r.shortfalls.map((s) => s.key)).toEqual(['env_couple', 'env_subs']);
@@ -26,9 +27,9 @@ describe('organizador semanal con la configuración inicial', () => {
     const r = buildPlan(planInput(50000));
     expect(r.mode).toBe('stability');
     expect(r.deficit).toBe(0);
-    expect(amountOf(r.lines, 'env_emergency')).toBe(4000 + 300);
-    expect(amountOf(r.lines, 'env_car_fund')).toBe(2000);
-    expect(r.unassigned).toBe(299);
+    expect(amountOf(r.lines, 'env_emergency')).toBe(4000);
+    expect(amountOf(r.lines, 'env_car_fund')).toBe(1099);
+    expect(r.unassigned).toBe(0);
     expect(r.totalAllocated + r.unassigned).toBe(50000);
   });
 
@@ -36,18 +37,19 @@ describe('organizador semanal con la configuración inicial', () => {
     const r = buildPlan(planInput(60000));
     expect(r.mode).toBe('stability');
     expect(amountOf(r.lines, 'env_subs')).toBe(1401);
-    expect(amountOf(r.lines, 'env_emergency')).toBe(4000 + 5300);
+    expect(amountOf(r.lines, 'env_emergency')).toBe(4000 + 4550);
     expect(amountOf(r.lines, 'env_car_fund')).toBe(2000);
-    expect(r.unassigned).toBe(5299);
+    expect(r.unassigned).toBe(4549);
   });
 
   it('semana de $800: sin impuestos todo el excedente se reparte entre ahorro y libre', () => {
     const r = buildPlan(planInput(80000));
     expect(r.mode).toBe('stability');
     expect(r.lines.find((l) => l.key === 'env_tax')).toBeUndefined();
-    expect(amountOf(r.lines, 'env_emergency')).toBe(4000 + 15300);
+    expect(amountOf(r.lines, 'env_emergency')).toBe(4000 + 14550);
+    expect(amountOf(r.lines, 'env_tolls')).toBe(1500);
     expect(amountOf(r.lines, 'env_invest')).toBe(0);
-    expect(r.unassigned).toBe(15299);
+    expect(r.unassigned).toBe(14549);
     expect(r.totalAllocated + r.unassigned).toBe(80000);
   });
 
@@ -55,16 +57,16 @@ describe('organizador semanal con la configuración inicial', () => {
     const r = buildPlan(planInput(110000));
     expect(r.mode).toBe('stability');
     expect(amountOf(r.lines, 'env_invest')).toBe(0);
-    expect(amountOf(r.lines, 'env_emergency')).toBe(4000 + 30300);
-    expect(r.unassigned).toBe(30299);
+    expect(amountOf(r.lines, 'env_emergency')).toBe(4000 + 29550);
+    expect(r.unassigned).toBe(29549);
   });
 
   it('semana de $1,100 con reserva mínima cubierta: Crecimiento e inversión', () => {
     const r = buildPlan(planInput(110000, { balances: { env_emergency: 50000 } }));
     expect(r.mode).toBe('growth');
     expect(amountOf(r.lines, 'env_emergency')).toBe(4000);
-    expect(amountOf(r.lines, 'env_invest')).toBe(30300);
-    expect(r.unassigned).toBe(30299);
+    expect(amountOf(r.lines, 'env_invest')).toBe(29550);
+    expect(r.unassigned).toBe(29549);
   });
 
   it('nunca invierte ni ahorra con déficit aunque las reservas estén llenas', () => {
@@ -97,6 +99,14 @@ describe('organizador semanal con la configuración inicial', () => {
 });
 
 describe('saldos existentes y prioridades', () => {
+  it('peajes: aparta $15 por semana y solo rellena lo que se usó', () => {
+    expect(amountOf(buildPlan(planInput(80000)).lines, 'env_tolls')).toBe(1500);
+    expect(amountOf(buildPlan(planInput(80000, { balances: { env_tolls: 600 } })).lines, 'env_tolls')).toBe(900);
+    // Se cubre antes que la vida diaria (es gasto de trabajo)
+    const order = buildPlan(planInput(40000)).lines.map((l) => l.key);
+    expect(order.indexOf('env_tolls')).toBeLessThan(order.indexOf('env_personal'));
+  });
+
   it('rellena gasolina solo hasta el presupuesto semanal', () => {
     const r = buildPlan(planInput(80000, { balances: { env_gas: 4000 } }));
     expect(amountOf(r.lines, 'env_gas')).toBe(11000);
@@ -179,6 +189,6 @@ describe('edición manual antes de confirmar', () => {
     expect(total).toBe(41000);
     const r = buildPlan(planInput(200000));
     const oblig = r.lines.filter((l) => OBLIGATIONS.includes(l.key)).reduce((s, l) => s + l.amount, 0);
-    expect(oblig).toBe(41000 + 1000 + 1401);
+    expect(oblig).toBe(41000 + 1500 + 1000 + 1401);
   });
 });

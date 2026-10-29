@@ -18,6 +18,7 @@ import {
   Plane,
   Receipt,
   Repeat,
+  Route,
   ShieldCheck,
   ShoppingCart,
   Smartphone,
@@ -68,7 +69,8 @@ export const ENVELOPE_ICONS: Record<string, LucideIcon> = {
   health: Stethoscope,
   hammer: Hammer,
   briefcase: Briefcase,
-  piggy: PiggyBank
+  piggy: PiggyBank,
+  route: Route
 };
 
 export const TIER_COLOR: Record<Tier | 'free', string> = {

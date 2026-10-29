@@ -39,6 +39,7 @@ import { flowTotals } from '@/engine/ledger';
 import { holdingSummary } from '@/engine/investments';
 import { needsReminder, summarizeSubscriptions } from '@/engine/subscriptions';
 import { goalCurrent } from '@/engine/goals';
+import { VEHICLE_CATEGORIES } from '@/models/types';
 
 export function DashboardPage() {
   const f = useFinance();
@@ -83,7 +84,7 @@ export function DashboardPage() {
     }
     const vehicleMisuse = f.transactions.filter((t) => {
       const env = t.envelopeId ? f.envelopes.find((e) => e.id === t.envelopeId) : undefined;
-      return env?.isVehicle && (t.type === 'expense' || t.type === 'fee') && !['Gasolina', 'Mantenimiento vehículo', 'Reparación vehículo', 'Seguro', 'Trabajo delivery'].includes(t.category) && diffDays(f.today, t.date) <= 30;
+      return env?.isVehicle && (t.type === 'expense' || t.type === 'fee') && !VEHICLE_CATEGORIES.includes(t.category) && diffDays(f.today, t.date) <= 30;
     });
     if (vehicleMisuse.length > 0) alerts.push({ icon: AlertTriangle, tone: 'destructive', to: '/movimientos', text: `Usaste fondos del vehículo para ${vehicleMisuse.length} gasto(s) personal(es) en los últimos 30 días.` });
     if (f.available < 0) alerts.push({ icon: AlertTriangle, tone: 'destructive', to: '/sobres', text: `Has apartado ${formatMoney(-f.available)} más de lo que tienes en tus cuentas. Revisa los sobres o registra tu saldo inicial.` });
@@ -120,7 +121,7 @@ export function DashboardPage() {
               <Sparkles className="size-5 text-primary" /> Bienvenido a ROA Finance
             </CardTitle>
             <CardDescription>
-              Ya cargué tus obligaciones (alquiler, teléfono, seguro, gasolina, personal y pareja = $410/semana), tus metas y tus suscripciones pendientes de cancelar. Todo es editable. Tus datos se guardan
+              Ya cargué tus obligaciones (alquiler, teléfono, seguro, gasolina, peajes, personal y pareja = $425/semana), tus metas y tus suscripciones pendientes de cancelar. Todo es editable. Tus datos se guardan
               <strong> solo en este dispositivo</strong> y no se sincronizan solos: haz copias de seguridad desde Ajustes.
             </CardDescription>
           </CardHeader>

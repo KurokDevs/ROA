@@ -290,6 +290,7 @@ export const CATEGORIES = [
   'Teléfono',
   'Seguro',
   'Gasolina',
+  'Peajes',
   'Mantenimiento vehículo',
   'Reparación vehículo',
   'Comida',
@@ -306,4 +307,4 @@ export const CATEGORIES = [
   'Otros'
 ] as const;
 
-export const VEHICLE_CATEGORIES = ['Gasolina', 'Mantenimiento vehículo', 'Reparación vehículo', 'Seguro', 'Trabajo delivery'];
+export const VEHICLE_CATEGORIES = ['Gasolina', 'Peajes', 'Mantenimiento vehículo', 'Reparación vehículo', 'Seguro', 'Trabajo delivery'];

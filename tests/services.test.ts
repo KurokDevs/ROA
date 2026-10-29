@@ -36,7 +36,8 @@ describe('flujo cobro → distribución → confirmación → almacenamiento', (
     expect(txs[0].type).toBe('income');
     const bal = await balances();
     expect(bal.get('env_rent')).toBe(10000);
-    expect(bal.get('env_emergency')).toBe(19300);
+    expect(bal.get('env_emergency')).toBe(18550);
+    expect(bal.get('env_tolls')).toBe(1500);
   });
 
   it('impide duplicar el presupuesto de la misma semana', async () => {
@@ -196,7 +197,7 @@ describe('patrimonio sin doble conteo', () => {
     const envelopeTotal = [...bal.values()].reduce((s, v) => s + v, 0);
     const nw = netWorth({ accounts: await db.accounts.toArray(), txs, debts: [], holdings: [], trades: [], envelopeTotal });
     expect(nw.netWorth).toBe(80000);
-    expect(nw.reservedInEnvelopes).toBe(80000 - 15299);
+    expect(nw.reservedInEnvelopes).toBe(80000 - 14549);
     const goal = (await db.goals.get('goal_nw5'))!;
     expect(goalCurrent(goal, bal, nw.netWorth)).toBe(80000);
   });

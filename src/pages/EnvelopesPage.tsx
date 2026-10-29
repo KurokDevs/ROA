@@ -166,6 +166,7 @@ function guessCategory(env: Envelope): string {
     env_phone: 'Teléfono',
     env_insurance: 'Seguro',
     env_gas: 'Gasolina',
+    env_tolls: 'Peajes',
     env_maint: 'Mantenimiento vehículo',
     env_car_fund: 'Reparación vehículo',
     env_personal: 'Comida',
